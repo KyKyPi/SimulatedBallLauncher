@@ -18,12 +18,9 @@ class Window(QWidget):
         self.heights_list = []
 
         # Creates number of points for graph
-        # num_div = 10
-        # self.time_div = [1/num_div]
-        # for i in range(num_div):
-        #     self.time_div.append(self.time_div[i - 1] + (1/num_div))
-
-        self.time_div = [1/10, 2/10, 3/10, 4/10, 5/10, 6/10, 7/10, 8/10, 9/10, 10/10]
+        num_div = 100
+        self.time_div = [1/num_div]
+        self.time_div = [t/num_div for t in range(num_div)]
 
         self.init_ui()
 
@@ -186,16 +183,14 @@ class Window(QWidget):
     def times(self):
         self.times_list = []
         t = self.totaltime
-        self.times_list.append(0)
-        for i in range(len(self.time_div)):
-            self.times_list.append(self.totaltime * self.time_div[i])
+        for time_div in self.time_div:
+            self.times_list.append(self.totaltime * time_div)
         self.times_list.append(t)
 
     def heights(self):
         self.heights_list = []
-        self.heights_list.append(0)
-        for i in range(len(self.time_div)):
-            t = self.totaltime * self.time_div[i]
+        for time_div in self.time_div:
+            t = self.totaltime * time_div
             self.heights_list.append(-0.5 * 9.81 * t * t + self.initialvelocity * t + 0)
         self.heights_list.append(0)
 
