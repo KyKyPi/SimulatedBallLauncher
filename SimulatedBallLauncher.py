@@ -17,6 +17,14 @@ class Window(QWidget):
         self.times_list = []
         self.heights_list = []
 
+        # Creates number of points for graph
+        # num_div = 10
+        # self.time_div = [1/num_div]
+        # for i in range(num_div):
+        #     self.time_div.append(self.time_div[i - 1] + (1/num_div))
+
+        self.time_div = [1/10, 2/10, 3/10, 4/10, 5/10, 6/10, 7/10, 8/10, 9/10, 10/10]
+
         self.init_ui()
 
     def init_ui(self):
@@ -39,9 +47,8 @@ class Window(QWidget):
 
         self.plot = pg.PlotWidget(title="Height (m) vs Time (sec)")
         self.plot.setWindowTitle("Graph")
-        xVals = [0]
-        yVals = [0]
-        self.plot.plotItem.plot(xVals, yVals)
+        self.plot.setXRange(0, 1.1, padding=0)
+        self.plot.setYRange(0, 1.3, padding=0)
 
         # Sim Launcher
         self.s1 = QSlider(Qt.Vertical)
@@ -177,30 +184,35 @@ class Window(QWidget):
         self.l6.setText('Notes: Not enough voltage supplied to launch')
 
     def times(self):
+        self.times_list = []
         t = self.totaltime
         self.times_list.append(0)
-        self.times_list.append(t/4)
-        self.times_list.append(t/2)
-        self.times_list.append(3*t/4)
+        for i in range(len(self.time_div)):
+            self.times_list.append(self.totaltime * self.time_div[i])
         self.times_list.append(t)
 
     def heights(self):
+        self.heights_list = []
         self.heights_list.append(0)
-        self.heights_list.append()
-        self.heights_list.append(self.maxheight)
+        for i in range(len(self.time_div)):
+            t = self.totaltime * self.time_div[i]
+            self.heights_list.append(-0.5 * 9.81 * t * t + self.initialvelocity * t + 0)
         self.heights_list.append(0)
 
     def update_plot(self):
+        self.plot.clear()
         self.plot.plotItem.plot(self.times_list, self.heights_list)
 
 
-# Install a global exception hook to catch pyQt errors that fall through (helps with debugging a ton) #TODO: Remove for builds
+# Install a global exception hook to catch pyQt errors that fall through (helps with debugging a ton)
+# #TODO: Remove for builds
 sys.__excepthook = sys.excepthook
 sys._excepthook  = sys.excepthook
 def exception_hook(exctype, value, traceback):
    sys._excepthook(exctype, value, traceback)
    sys.exit(1)
-sys.excepthook   = exception_hook
+sys.excepthook = exception_hook
+
 
 app = QApplication(sys.argv)
 a_window = Window()
