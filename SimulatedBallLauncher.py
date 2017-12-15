@@ -179,6 +179,7 @@ class Window(QWidget):
         self.le5.setText(str(self.maxheight))
         self.simlaunch()
         self.l6.setText('Notes: Not enough voltage supplied to launch')
+        self.plot.clear()
 
     def times(self):
         self.times_list = []
