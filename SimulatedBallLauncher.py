@@ -2,7 +2,8 @@ import sys
 from PyQt5.QtWidgets import (QLabel, QLineEdit, QSlider, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QWidget)
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt
-import numpy as np
+from PyQt5 import QtCore
+import time
 
 class Window(QWidget):
 
@@ -18,9 +19,14 @@ class Window(QWidget):
         self.heights_list = []
 
         # Creates number of points for graph
-        num_div = 100
-        self.time_div = [1/num_div]
-        self.time_div = [t/num_div for t in range(num_div)]
+        self.num_div = 4
+        self.time_div = [1/self.num_div]
+        self.time_div = [t/self.num_div for t in range(self.num_div)]
+
+        # Timer
+        self.timer = QtCore.QTimer(self)
+        self.plot_xval = []
+        self.plot_yval = []
 
         self.init_ui()
 
@@ -86,7 +92,7 @@ class Window(QWidget):
         h_box1.addStretch()
 
         self.setLayout(h_box1)
-        self.setWindowTitle("Thesis Try 1")
+        self.setWindowTitle("Simulated Launch Station")
 
         self.b1.setDisabled(True)   # Don't press the button if no number is entered - button is disabled the first time but not after that
         self.le1.textChanged.connect(self.button_enable)
@@ -98,6 +104,8 @@ class Window(QWidget):
         self.b1.setDisabled(False)
 
     def typeVoltage(self):
+        # self.times_list = []
+        # self.heights_list = []
         voltage = float(self.le1.text())
         self.voltage = round(voltage, 2)
         self.le1.setText(str(self.voltage))
@@ -112,21 +120,8 @@ class Window(QWidget):
             self.simlaunch()
             self.times()
             self.heights()
-            self.update_plot()
-
-    # def readVoltage(self):
-    #     voltageRead = 3.0
-    #     self.voltage = round(voltageRead, 2)
-    #     self.le1.setText(str(self.voltage))
-    #
-    #     if self.voltage < 1:    # if less than 1V supplied then no launch occurs
-    #         self.zero()
-    #     else:
-    #         self.wheelSpeed()
-    #         self.ballVelocity()
-    #         self.totalTime()
-    #         self.maxHeight()
-    #         self.simlaunch()
+            self.timer_connect()
+            # self.timer_connect()
 
     def wheelSpeed(self):
         a = 0.034  # Vs/rad
@@ -192,12 +187,57 @@ class Window(QWidget):
         for time_div in self.time_div:
             t = self.totaltime * time_div
             self.heights_list.append(-0.5 * 9.81 * t * t + self.initialvelocity * t + 0)
+            # self.plot.plotItem.plot(self.times_list, self.heights_list)
         self.heights_list.append(0)
 
     def update_plot(self):
         self.plot.clear()
         self.plot.plotItem.plot(self.times_list, self.heights_list)
 
+    def timer_connect(self):
+        for i in range(len(self.times_list)):
+            self.timer.setInterval(5000/self.num_div)  # in milliseconds
+            self.timer.start()
+            self.timer.timeout.connect(lambda: self.update(i))
+
+    def update(self, i):
+        self.plot_xval.append(self.times_list[i])
+        self.plot_yval.append(self.heights_list[i])
+        self.plot.clear()
+        self.s1.setValue(self.heights_list[i])
+        self.plot.plotItem.plot(self.plot_xval, self.plot_yval)
+
+    # def update(self, time_div):
+    #     for time_div in self.time_div:
+    #         xval = (self.totaltime * time_div)
+    #         yval = -0.5 * 9.81 * xval * xval + self.initialvelocity * xval + 0
+    #         self.times_list.append(xval)
+    #         self.heights_list.append(yval)
+    #         # time.sleep(0.1)
+    #         self.s1.setValue(yval*100)
+    #         self.plot.plotItem.plot(self.times_list, self.heights_list)
+    #         self.times_list.append(self.totaltime)
+    #     self.heights_list.append(0)
+    #     self.s1.setValue(0 * 100)
+    #     self.plot.plotItem.plot(self.times_list, self.heights_list)
+
+    # def update(self):
+    #     xvals = []
+    #     yvals = []
+    #     xval = (self.totaltime * time_div)
+    #     yval = -0.5 * 9.81 * xval * xval + self.initialvelocity * xval + 0
+    #     xvals.append(xval)
+    #     yvals.append(yval)
+    #     self.timer.setInterval(1000)  # in milliseconds
+    #     self.timer.start()
+    #     while ~self.timer.timeout:
+    #         pass
+    #     self.s1.setValue(yval*100)
+    #     self.plot.clear()
+    #     self.plot.plotItem.plot(xvals, yvals)
+    #     xvals.append(self.totaltime)
+    #     yvals.append(0)
+    #     self.plot.plotItem.plot(xvals, yvals)
 
 # Install a global exception hook to catch pyQt errors that fall through (helps with debugging a ton)
 # #TODO: Remove for builds
