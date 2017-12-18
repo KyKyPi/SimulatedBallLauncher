@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5 import QtCore
 import time
 
+
 class Window(QWidget):
 
     def __init__(self):
@@ -19,8 +20,7 @@ class Window(QWidget):
         self.heights_list = []
 
         # Creates number of points for graph
-        self.num_div = 4
-        self.time_div = [1/self.num_div]
+        self.num_div = 100
         self.time_div = [t/self.num_div for t in range(self.num_div)]
 
         # Timer
@@ -117,7 +117,6 @@ class Window(QWidget):
             self.ballVelocity()
             self.totalTime()
             self.maxHeight()
-            self.simlaunch()
             self.times()
             self.heights()
             self.timer_connect()
@@ -157,10 +156,6 @@ class Window(QWidget):
         self.maxheight = round(yf, 2)
         self.le5.setText(str(self.maxheight))
 
-    def simlaunch(self):
-        height = self.maxheight
-        self.s1.setValue(height * 100)
-
     def zero(self):
         self.voltage = 0
         self.le1.setText(str(self.voltage))
@@ -195,17 +190,20 @@ class Window(QWidget):
         self.plot.plotItem.plot(self.times_list, self.heights_list)
 
     def timer_connect(self):
-        for i in range(len(self.times_list)):
-            self.timer.setInterval(5000/self.num_div)  # in milliseconds
-            self.timer.start()
-            self.timer.timeout.connect(lambda: self.update(i))
-
-    def update(self, i):
-        self.plot_xval.append(self.times_list[i])
-        self.plot_yval.append(self.heights_list[i])
         self.plot.clear()
-        self.s1.setValue(self.heights_list[i])
-        self.plot.plotItem.plot(self.plot_xval, self.plot_yval)
+        self.timer.timeout.connect(self.update)  # TODO: move to init
+        self.timer.start(self.totaltime * 1000 / self.num_div)  # ms
+
+    def update(self):
+        i = len(self.plot.plotItem.dataItems)
+
+        self.plot.plotItem.plot(self.times_list[:i+1], self.heights_list[:i+1])
+        self.s1.setValue(self.heights_list[i] * 100)
+
+        if i == len(self.heights_list) - 1:
+            self.timer.stop()
+            self.timer.disconnect()  # TODO: Delete
+
 
     # def update(self, time_div):
     #     for time_div in self.time_div:
