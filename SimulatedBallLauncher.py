@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QLabel, QLineEdit, QSlider, QPushButton, QVBoxLayou
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore
-import time
+import Adafruit_ADS1x15
 
 
 class Window(QWidget):
@@ -94,9 +94,9 @@ class Window(QWidget):
         self.setLayout(h_box1)
         self.setWindowTitle("Simulated Launch Station")
 
-        self.b1.setDisabled(True)   # Don't press the button if no number is entered - button is disabled the first time but not after that
-        self.le1.textChanged.connect(self.button_enable)
-        self.b1.clicked.connect(self.typeVoltage)
+        # self.b1.setDisabled(True)   # Don't press the button if no number is entered - button is disabled the first time but not after that
+        # self.le1.textChanged.connect(self.button_enable)
+        self.b1.clicked.connect(self.readVoltage)
 
         self.show()
 
@@ -121,6 +121,31 @@ class Window(QWidget):
             self.heights()
             self.timer_connect()
             # self.timer_connect()
+
+    def readVoltage(self):
+        adc = Adafruit_ADS1x15.ADS1115()
+
+        GAIN = 1
+
+        adc_val = adc.read_adc(0, gain=GAIN)
+        print('Digital Value: ' + str(adc_val))
+        self.voltage = (3.3 * adc_val) / 26551
+        print('Voltage Value: ' + str(self.voltage))
+        self.voltage = round(self.voltage, 2)
+        print(self.voltage)
+
+        self.le1.setText(str(self.voltage))
+
+        if self.voltage < 1:  # if less than 1V supplied then no launch occurs
+            self.zero()
+        else:
+            self.wheelSpeed()
+            self.ballVelocity()
+            self.totalTime()
+            self.maxHeight()
+            self.times()
+            self.heights()
+            self.timer_connect()
 
     def wheelSpeed(self):
         a = 0.034  # Vs/rad
@@ -167,7 +192,7 @@ class Window(QWidget):
         self.le4.setText(str(self.totaltime))
         self.maxheight = 0
         self.le5.setText(str(self.maxheight))
-        self.simlaunch()
+        # self.simlaunch()
         self.l6.setText('Notes: Not enough voltage supplied to launch')
 
     def times(self):
