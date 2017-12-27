@@ -79,9 +79,6 @@ class Window(QWidget):
         self.l7 = QLabel('0.9 meters')  # Slider max label
         self.l8 = QLabel('0 meters')    # Slider min label
 
-        myFont = QFont()
-        myFont.setBold(True)
-
         self.plot = pg.PlotWidget(title="Height (m) vs Time (sec)")
         self.plot.setWindowTitle("Graph")
         self.plot.setXRange(0, 0.9, padding=0)
