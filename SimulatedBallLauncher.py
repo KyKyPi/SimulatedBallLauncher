@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import (QLabel, QLineEdit, QSlider, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QWidget)
+from PyQt5.QtWidgets import (QLabel, QLineEdit, QSlider, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QWidget, QDesktopWidget)
 import pyqtgraph as pg
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore
@@ -8,8 +8,32 @@ import Adafruit_ADS1x15
 
 class Window(QWidget):
 
-    def __init__(self):
+    def __init__(self, input):
         super().__init__()
+        self.screen = QDesktopWidget().availableGeometry(-1)
+        if input == 0:
+            self.setGeometry(0, 0, self.screen.width() / 2, self.screen.height() / 2)
+            self.button_pin = 0
+            self.adc_pin = 0
+            self.background_color = Qt.blue
+        elif input == 1:
+            self.setGeometry(self.screen.width() / 2, 0, self.screen.width() / 2, self.screen.height() / 2)
+            self.button_pin = 1
+            self.adc_pin = 1
+            self.background_color = Qt.yellow
+        elif input == 2:
+            self.setGeometry(0, self.screen.height() / 2, self.screen.width() / 2, self.screen.height() / 2)
+            self.button_pin = 2
+            self.adc_pin = 2
+            self.background_color = Qt.red
+        else:  # input == 3
+            self.setGeometry(self.screen.width() / 2, self.screen.height() / 2, self.screen.width() / 2, self.screen.height() / 2)
+            self.button_pin = 3
+            self.adc_pin = 3
+            self.background_color = Qt.green
+
+        self.setWindowFlags(QtCore.Qt.CustomizeWindowHint)  # Hides window title bar
+
         self.voltage = None
         self.wheelspeed = None
         self.initialvelocity = None
@@ -19,6 +43,12 @@ class Window(QWidget):
         self.times_list = []
         self.heights_list = []
 
+        # Set window background color
+        self.setAutoFillBackground(True)
+        p = self.palette()
+        p.setColor(self.backgroundRole(), self.background_color)
+        self.setPalette(p)
+
         # Creates number of points for graph
         self.num_div = 100
         self.time_div = [t/self.num_div for t in range(self.num_div)]
@@ -27,6 +57,7 @@ class Window(QWidget):
         self.timer = QtCore.QTimer(self)
         self.plot_xval = []
         self.plot_yval = []
+        self.timer.timeout.connect(self.update)
 
         self.init_ui()
 
@@ -45,18 +76,21 @@ class Window(QWidget):
         self.le5 = QLineEdit(None)
         self.l6 = QLabel('Notes: ')
 
-        self.l7 = QLabel('1.3 meters')  # Slider max label
+        self.l7 = QLabel('0.9 meters')  # Slider max label
         self.l8 = QLabel('0 meters')    # Slider min label
+
+        myFont = QFont()
+        myFont.setBold(True)
 
         self.plot = pg.PlotWidget(title="Height (m) vs Time (sec)")
         self.plot.setWindowTitle("Graph")
-        self.plot.setXRange(0, 1.1, padding=0)
-        self.plot.setYRange(0, 1.3, padding=0)
+        self.plot.setXRange(0, 0.9, padding=0)
+        self.plot.setYRange(0, 0.9, padding=0)
 
         # Sim Launcher
         self.s1 = QSlider(Qt.Vertical)
         self.s1.setMinimum(0)
-        self.s1.setMaximum(130)
+        self.s1.setMaximum(90)
         self.s1.setValue(0)
         self.s1.setTickInterval(5)
         self.s1.setTickPosition(QSlider.TicksBelow)
@@ -96,7 +130,7 @@ class Window(QWidget):
 
         # self.b1.setDisabled(True)   # Don't press the button if no number is entered - button is disabled the first time but not after that
         # self.le1.textChanged.connect(self.button_enable)
-        self.b1.clicked.connect(self.readVoltage)
+        self.b1.clicked.connect(self.typeVoltage)   # Change to self.readVoltage when connected to Hardware
 
         self.show()
 
@@ -192,7 +226,7 @@ class Window(QWidget):
         self.le4.setText(str(self.totaltime))
         self.maxheight = 0
         self.le5.setText(str(self.maxheight))
-        # self.simlaunch()
+        self.plot.clear()
         self.l6.setText('Notes: Not enough voltage supplied to launch')
 
     def times(self):
@@ -216,10 +250,10 @@ class Window(QWidget):
 
     def timer_connect(self):
         self.plot.clear()
-        self.timer.timeout.connect(self.update)  # TODO: move to init
         self.timer.start(self.totaltime * 1000 / self.num_div)  # ms
 
     def update(self):
+        self.l6.setText('Notes:')
         i = len(self.plot.plotItem.dataItems)
 
         self.plot.plotItem.plot(self.times_list[:i+1], self.heights_list[:i+1])
@@ -227,40 +261,7 @@ class Window(QWidget):
 
         if i == len(self.heights_list) - 1:
             self.timer.stop()
-            self.timer.disconnect()  # TODO: Delete
 
-
-    # def update(self, time_div):
-    #     for time_div in self.time_div:
-    #         xval = (self.totaltime * time_div)
-    #         yval = -0.5 * 9.81 * xval * xval + self.initialvelocity * xval + 0
-    #         self.times_list.append(xval)
-    #         self.heights_list.append(yval)
-    #         # time.sleep(0.1)
-    #         self.s1.setValue(yval*100)
-    #         self.plot.plotItem.plot(self.times_list, self.heights_list)
-    #         self.times_list.append(self.totaltime)
-    #     self.heights_list.append(0)
-    #     self.s1.setValue(0 * 100)
-    #     self.plot.plotItem.plot(self.times_list, self.heights_list)
-
-    # def update(self):
-    #     xvals = []
-    #     yvals = []
-    #     xval = (self.totaltime * time_div)
-    #     yval = -0.5 * 9.81 * xval * xval + self.initialvelocity * xval + 0
-    #     xvals.append(xval)
-    #     yvals.append(yval)
-    #     self.timer.setInterval(1000)  # in milliseconds
-    #     self.timer.start()
-    #     while ~self.timer.timeout:
-    #         pass
-    #     self.s1.setValue(yval*100)
-    #     self.plot.clear()
-    #     self.plot.plotItem.plot(xvals, yvals)
-    #     xvals.append(self.totaltime)
-    #     yvals.append(0)
-    #     self.plot.plotItem.plot(xvals, yvals)
 
 # Install a global exception hook to catch pyQt errors that fall through (helps with debugging a ton)
 # #TODO: Remove for builds
@@ -273,5 +274,8 @@ sys.excepthook = exception_hook
 
 
 app = QApplication(sys.argv)
-a_window = Window()
+a_window = Window(0)
+b_window = Window(1)
+c_window = Window(2)
+d_window = Window(3)
 sys.exit(app.exec_())
