@@ -1,0 +1,11 @@
+[Unit]
+Description=Simulated Ball Launcher
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/pi/Thesis/SimulatedBallLauncher.py
+Environment=DISPLAY=:0.0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+
+[Install]
+WantedBy=multi-user.target
