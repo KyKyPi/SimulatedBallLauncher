@@ -4,7 +4,7 @@ import pyqtgraph as pg
 from PyQt5.QtCore import Qt
 from PyQt5 import QtCore
 import Adafruit_ADS1x15
-
+import RPi.GPIO as GPIO
 
 class Window(QWidget):
 
@@ -60,6 +60,20 @@ class Window(QWidget):
         self.timer.timeout.connect(self.update)
 
         self.init_ui()
+
+        # GPIO Timer
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(14, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        self.timer1 = QtCore.QTimer(self)
+        self.timer1.timeout.connect(self.readVoltage)
+        self.timer1.start(100)
+
+
+    # def GPIOread(self):
+    #     if GPIO.input(14) == 1:
+    #         print("ON")
+    #     else:
+    #         print("OFF")
 
     def init_ui(self):
         # Calculations
@@ -127,7 +141,8 @@ class Window(QWidget):
 
         # self.b1.setDisabled(True)   # Don't press the button if no number is entered - button is disabled the first time but not after that
         # self.le1.textChanged.connect(self.button_enable)
-        self.b1.clicked.connect(self.typeVoltage)   # Change to self.readVoltage when connected to Hardware
+        self.b1.clicked.connect(self.readVoltage)   # Change to self.readVoltage when connected to Hardware
+        #GPIO.add_event_detect(14, GPIO.RISING, callback=my_callback, bouncetime=300)
 
         self.show()
 
@@ -158,25 +173,26 @@ class Window(QWidget):
 
         GAIN = 1
 
-        adc_val = adc.read_adc(0, gain=GAIN)
-        print('Digital Value: ' + str(adc_val))
+        adc_val = adc.read_adc(self.adc_pin, gain=GAIN)
+        # print('Digital Value: ' + str(adc_val))
         self.voltage = (3.3 * adc_val) / 26551
-        print('Voltage Value: ' + str(self.voltage))
+        # print('Voltage Value: ' + str(self.voltage))
         self.voltage = round(self.voltage, 2)
-        print(self.voltage)
+        # print(self.voltage)
 
         self.le1.setText(str(self.voltage))
 
         if self.voltage < 1:  # if less than 1V supplied then no launch occurs
             self.zero()
         else:
-            self.wheelSpeed()
-            self.ballVelocity()
-            self.totalTime()
-            self.maxHeight()
-            self.times()
-            self.heights()
-            self.timer_connect()
+            if GPIO.input(14) == 1:
+                self.wheelSpeed()
+                self.ballVelocity()
+                self.totalTime()
+                self.maxHeight()
+                self.times()
+                self.heights()
+                self.timer_connect()
 
     def wheelSpeed(self):
         a = 0.034  # Vs/rad
