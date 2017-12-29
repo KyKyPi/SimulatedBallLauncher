@@ -13,22 +13,22 @@ class Window(QWidget):
         self.screen = QDesktopWidget().availableGeometry(-1)
         if input == 0:
             self.setGeometry(0, 0, self.screen.width() / 2, self.screen.height() / 2)
-            self.button_pin = 0
+            self.button_pin = 14
             self.adc_pin = 0
-            self.background_color = Qt.blue
+            self.background_color = Qt.cyan
         elif input == 1:
             self.setGeometry(self.screen.width() / 2, 0, self.screen.width() / 2, self.screen.height() / 2)
-            self.button_pin = 1
+            self.button_pin = 15
             self.adc_pin = 1
             self.background_color = Qt.yellow
         elif input == 2:
             self.setGeometry(0, self.screen.height() / 2, self.screen.width() / 2, self.screen.height() / 2)
-            self.button_pin = 2
+            self.button_pin = 17
             self.adc_pin = 2
-            self.background_color = Qt.red
+            self.background_color = Qt.magenta
         else:  # input == 3
             self.setGeometry(self.screen.width() / 2, self.screen.height() / 2, self.screen.width() / 2, self.screen.height() / 2)
-            self.button_pin = 3
+            self.button_pin = 18
             self.adc_pin = 3
             self.background_color = Qt.green
 
@@ -50,7 +50,7 @@ class Window(QWidget):
         self.setPalette(p)
 
         # Creates number of points for graph
-        self.num_div = 100
+        self.num_div = 15
         self.time_div = [t/self.num_div for t in range(self.num_div)]
 
         # Timer
@@ -63,7 +63,7 @@ class Window(QWidget):
 
         # GPIO Timer
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(14, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.button_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         self.timer1 = QtCore.QTimer(self)
         self.timer1.timeout.connect(self.readVoltage)
         self.timer1.start(100)
@@ -79,7 +79,7 @@ class Window(QWidget):
         # Calculations
         self.l1 = QLabel('Voltage Read (V)')
         self.le1 = QLineEdit(None)
-        self.b1 = QPushButton('Read Voltage')
+        # self.b1 = QPushButton('Read Voltage')
         self.l2 = QLabel('Speed of Wheel (rad/s)')
         self.le2 = QLineEdit(None)
         self.l3 = QLabel('Initial Velocity of the ball (m/s)')
@@ -109,7 +109,7 @@ class Window(QWidget):
         v_box1 = QVBoxLayout()
         v_box1.addWidget(self.l1)
         v_box1.addWidget(self.le1)
-        v_box1.addWidget(self.b1)
+        # v_box1.addWidget(self.b1)
         v_box1.addWidget(self.l2)
         v_box1.addWidget(self.le2)
         v_box1.addWidget(self.l3)
@@ -141,51 +141,51 @@ class Window(QWidget):
 
         # self.b1.setDisabled(True)   # Don't press the button if no number is entered - button is disabled the first time but not after that
         # self.le1.textChanged.connect(self.button_enable)
-        self.b1.clicked.connect(self.readVoltage)   # Change to self.readVoltage when connected to Hardware
+        # self.b1.clicked.connect(self.readVoltage)   # Change to self.readVoltage when connected to Hardware
         #GPIO.add_event_detect(14, GPIO.RISING, callback=my_callback, bouncetime=300)
 
         self.show()
 
-    def button_enable(self):
-        self.b1.setDisabled(False)
+    # def button_enable(self):
+    #     self.b1.setDisabled(False)
 
-    def typeVoltage(self):
-        # self.times_list = []
-        # self.heights_list = []
-        voltage = float(self.le1.text())
-        self.voltage = round(voltage, 2)
-        self.le1.setText(str(self.voltage))
-
-        if self.voltage < 1:    # if less than 1V supplied then no launch occurs
-            self.zero()
-        else:
-            self.wheelSpeed()
-            self.ballVelocity()
-            self.totalTime()
-            self.maxHeight()
-            self.times()
-            self.heights()
-            self.timer_connect()
-            # self.timer_connect()
+    # def typeVoltage(self):
+    #     # self.times_list = []
+    #     # self.heights_list = []
+    #     voltage = float(self.le1.text())
+    #     self.voltage = round(voltage, 2)
+    #     self.le1.setText(str(self.voltage))
+    #
+    #     if self.voltage < 1:    # if less than 1V supplied then no launch occurs
+    #         self.zero()
+    #     else:
+    #         self.wheelSpeed()
+    #         self.ballVelocity()
+    #         self.totalTime()
+    #         self.maxHeight()
+    #         self.times()
+    #         self.heights()
+    #         self.timer_connect()
+    #         # self.timer_connect()
 
     def readVoltage(self):
-        adc = Adafruit_ADS1x15.ADS1115()
+        if GPIO.input(self.button_pin) == 1:
+            adc = Adafruit_ADS1x15.ADS1115()
 
-        GAIN = 1
+            GAIN = 1
 
-        adc_val = adc.read_adc(self.adc_pin, gain=GAIN)
-        # print('Digital Value: ' + str(adc_val))
-        self.voltage = (3.3 * adc_val) / 26551
-        # print('Voltage Value: ' + str(self.voltage))
-        self.voltage = round(self.voltage, 2)
-        # print(self.voltage)
+            adc_val = adc.read_adc(self.adc_pin, gain=GAIN)
+            # print('Digital Value: ' + str(adc_val))
+            self.voltage = (3.3 * adc_val) / 26551
+            # print('Voltage Value: ' + str(self.voltage))
+            self.voltage = round(self.voltage, 2)
+            # print(self.voltage)
 
-        self.le1.setText(str(self.voltage))
-
-        if self.voltage < 1:  # if less than 1V supplied then no launch occurs
-            self.zero()
-        else:
-            if GPIO.input(14) == 1:
+            if self.voltage < 1:  # if less than 1V supplied then no launch occurs
+                self.zero()
+            else:
+                self.l6.setText('Notes:')
+                self.le1.setText(str(self.voltage))
                 self.wheelSpeed()
                 self.ballVelocity()
                 self.totalTime()
@@ -257,23 +257,24 @@ class Window(QWidget):
             # self.plot.plotItem.plot(self.times_list, self.heights_list)
         self.heights_list.append(0)
 
-    def update_plot(self):
-        self.plot.clear()
-        self.plot.plotItem.plot(self.times_list, self.heights_list)
+    # def update_plot(self):
+    #     self.plot.clear()
+    #     self.plot.plotItem.plot(self.times_list, self.heights_list)
 
     def timer_connect(self):
         self.plot.clear()
+        self.timer1.stop()
         self.timer.start(self.totaltime * 1000 / self.num_div)  # ms
 
     def update(self):
-        self.l6.setText('Notes:')
         i = len(self.plot.plotItem.dataItems)
 
-        self.plot.plotItem.plot(self.times_list[:i+1], self.heights_list[:i+1])
+        self.plot.plotItem.plot(self.times_list[i-1:i+1], self.heights_list[i-1:i+1])
         self.s1.setValue(self.heights_list[i] * 100)
 
         if i == len(self.heights_list) - 1:
             self.timer.stop()
+            self.timer1.start()
 
 
 # Install a global exception hook to catch pyQt errors that fall through (helps with debugging a ton)
