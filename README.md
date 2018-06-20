@@ -1,5 +1,5 @@
 # SimulatedBallLauncher
-Software for my Barrett honors thesis. 
+Software for my Barrett honors thesis. \
 Raspberry Pi and voltage divider circuit driven simulated ball launcher, calculations, and graph.
 
 
