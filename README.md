@@ -33,20 +33,20 @@ Dashed List
 
 ## Quotes
 > Quote
-'item'
+`item`
 
 ## Code
-'inline code'
+`inline code`
 
     Four tabs
-'''
+```
 quotes before and after
-'''
+```
 
-'''python
+```python
 if True:
     print("colored for language")
-'''
+```
 
 ## Task lists
 
