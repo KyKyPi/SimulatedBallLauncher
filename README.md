@@ -17,8 +17,8 @@ Each kit was used by a group of 3-4 students. \
 1 - LEDs \
 3 - Jumper wires \
 1 - Switch \
-14 - Resistors \
-![KitCircuit](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/KitCircuit.png)
+14 - Resistors
+![KitCircuit](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/KitCircuit.png | width = 200)
 
 ## The Simulator
 1 - Projector \
@@ -26,20 +26,20 @@ Each kit was used by a group of 3-4 students. \
 1- Analog to Digital converter \
 1- HDMI cord \
 16 - Alligator clips \
-10 - Jumper wires \
-*All of the launch station components were provided pre-assembled for this lesson. The Raspberry Pi was just plugged into an outlet and the projector. \
+10 - Jumper wires
+*All of the launch station components were provided pre-assembled for this lesson. The Raspberry Pi was just plugged into an outlet and the projector.
 
 SimulatedBallLauncher.py takes in readings from the Raspberry Pi. One value is the value measuring the voltage in a voltage divider circuit after going through an ADC. The other value is just a GPIO pin which determines if the connected switch has been flipped. This simulator consists of four instances of a class (Window). This class creates one 'simulator'. By creating four instances, a single screen will display 4 'simulators' so 4 students can use the simulator at the same time. Each instance will include an output of various calculations, a simulated ball launch, and a height vs time graph.
-![SingleInstance](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimSingleInstance.png)
-![FourInstances](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimFourInstance.png)
+![SingleInstance](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimSingleInstance.png | width = 200)
+![FourInstances](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimFourInstance.png | width = 200)
 
-The full simulator and kit set up is shown below. \
-![FullSystem](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/FullSystem.png)
+The full simulator and kit set up is shown below.
+![FullSystem](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/FullSystem.png | width = 200)
 A: Raspberry Pi \
 B: ADC \
 C: Wires to switch \
 D: Wires to sense voltage \
-E: Power/Ground wires \
+E: Power/Ground wires
 
 For the lesson, students were asked to preform these calculations by hand prior to connecting their circuit to the simulator. Running the simulator, allows them to check their calculations and see a simulated version of their theoretical launch.
 
@@ -58,6 +58,6 @@ KyleeBurgess_HonorsThesis_FinalReport.pdf
   - Future Work \
 SimReadVoltage.py
 - Code used to read in a value from an ADC with a Raspberry Pi and convert it to a voltage.
-- This code is already included as necessary in SimulatedBallLauncher.py \
+- This code is already included as necessary in SimulatedBallLauncher.py
 
 [Barrett Honors Thesis Repository](https://repository.asu.edu/items/47900)
