@@ -18,7 +18,7 @@ Each kit was used by a group of 3-4 students. \
 3 - Jumper wires \
 1 - Switch \
 14 - Resistors
-![KitCircuit](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/KitCircuit.png){:height="50%" width="50%"}
+![KitCircuit](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/KitCircuit.pngs=200)
 
 ## The Simulator
 1 - Projector \
@@ -30,11 +30,11 @@ Each kit was used by a group of 3-4 students. \
 *All of the launch station components were provided pre-assembled for this lesson. The Raspberry Pi was just plugged into an outlet and the projector.
 
 SimulatedBallLauncher.py takes in readings from the Raspberry Pi. One value is the value measuring the voltage in a voltage divider circuit after going through an ADC. The other value is just a GPIO pin which determines if the connected switch has been flipped. This simulator consists of four instances of a class (Window). This class creates one 'simulator'. By creating four instances, a single screen will display 4 'simulators' so 4 students can use the simulator at the same time. Each instance will include an output of various calculations, a simulated ball launch, and a height vs time graph.
-![SingleInstance](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimSingleInstance.png){:height="50%" width="50%"}
-![FourInstances](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimFourInstance.png){:height="50%" width="50%"}
+![SingleInstance](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimSingleInstance.pngs=200)
+![FourInstances](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/SimFourInstance.pngs=200)
 
 The full simulator and kit set up is shown below.
-![FullSystem](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/FullSystem.png=){:height="50%" width="50%"}
+![FullSystem](https://github.com/KyKyPi/SimulatedBallLauncher/blob/master/FullSystem.pngs=200)
 A: Raspberry Pi \
 B: ADC \
 C: Wires to switch \
@@ -46,6 +46,7 @@ For the lesson, students were asked to preform these calculations by hand prior 
 ## Important Documents
 SimulatedBallLauncher.py
 - Actual code used in simulator \
+
 KyleeBurgess_HonorsThesis_FinalReport.pdf
 - Submitted honors thesis final report
 - Includes...
@@ -56,6 +57,7 @@ KyleeBurgess_HonorsThesis_FinalReport.pdf
   - User Feedback
   - Reflection/Lessons Learned
   - Future Work \
+
 SimReadVoltage.py
 - Code used to read in a value from an ADC with a Raspberry Pi and convert it to a voltage.
 - This code is already included as necessary in SimulatedBallLauncher.py
